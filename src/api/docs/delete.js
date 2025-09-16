@@ -25,6 +25,11 @@ export default async function handler(req, res) {
             const result = await handleDeleteDocument(filePath, authToken);
 
             if (result.success) {
+                console.log(
+                    `${
+                        new Date().toTimeString().split(" ")[0]
+                    } Deleted document: ${filePath}`
+                );
                 return res.status(200).json(result);
             }
 

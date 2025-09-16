@@ -108,6 +108,12 @@ export default async function handler(req, res) {
                 // Move the file to its final destination
                 fs.renameSync(tempPath, finalPath);
 
+                console.log(
+                    `${
+                        new Date().toTimeString().split(" ")[0]
+                    } Uploaded new image: ${finalFilename}`
+                );
+
                 return res.status(200).json({
                     success: true,
                     message: "Image uploaded successfully",

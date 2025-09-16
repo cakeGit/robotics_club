@@ -28,6 +28,11 @@ export default async function handler(req, res) {
             const result = await handleDeleteImage(imageName, authToken);
 
             if (result.success) {
+                console.log(
+                    `${
+                        new Date().toTimeString().split(" ")[0]
+                    } Deleted image: ${imageName}`
+                );
                 return res.status(200).json(result);
             } else {
                 return res

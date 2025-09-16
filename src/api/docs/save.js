@@ -33,6 +33,11 @@ export default async function handler(req, res) {
 
             if (result.success) {
                 res.status(200).json(result);
+                console.log(
+                    `${
+                        new Date().toTimeString().split(" ")[0]
+                    } Edited document: ${filePath}`
+                );
             } else {
                 res.status(400).json(result);
             }

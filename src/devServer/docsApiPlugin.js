@@ -8,7 +8,7 @@ const dataDir = path.join(projectRoot, "data", "pages");
 // Get __dirname equivalent in ES module (kept for backwards compatibility)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-console.log(`[docs-api-plugin] initialized, dataDir=${dataDir}`);
+console.log(`Initialized docs api, dataDir=${dataDir}`);
 
 // Helper function to create a directory structure from filesystem
 const createDirectoryTree = async (dirPath) => {
@@ -167,9 +167,6 @@ async function handlePageIndex(req, res) {
 async function handlePageContent(req, res) {
     try {
         const pagePath = req.url.split("?")[0].substring("/api/page/".length);
-        console.log(
-            `[docs-api-plugin] handlePageContent requested pagePath=${pagePath}`
-        );
         const fullPath = path.join(dataDir, pagePath);
 
         if (!(await fs.pathExists(fullPath))) {
@@ -214,13 +211,8 @@ export function setupDocsApiRoutes(server) {
         // Normalize URL (strip query string) to make matching robust
         const normalizedUrl = req.url.split("?")[0];
 
-        // Log API requests for debugging
-        if (normalizedUrl.startsWith("/api")) {
-            console.log(`[docs-api-plugin] incoming ${req.method} ${req.url}`);
-        }
         // Page index endpoint
         if (req.method === "GET" && normalizedUrl === "/api/page_index") {
-            console.log("[docs-api-plugin] GET /api/page_index");
             handlePageIndex(req, res);
             return;
         }

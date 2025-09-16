@@ -28,6 +28,11 @@ export default async function handler(req, res) {
             const result = await handleRenameImage(oldName, newName, authToken);
 
             if (result.success) {
+                console.log(
+                    `${
+                        new Date().toTimeString().split(" ")[0]
+                    } Renamed image: ${oldName} to ${newName}`
+                );
                 return res.status(200).json(result);
             } else {
                 if (result.code === "NOT_FOUND") {

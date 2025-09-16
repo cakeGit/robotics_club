@@ -160,15 +160,15 @@ const DocLayout = () => {
       <main className="flex-1 p-8 overflow-y-auto bg-background relative">
         <MarkdownContent path={currentPath} />
         
-        {/* Edit button */}
-        <div className="absolute bottom-8 right-8">
+        {/* Edit button*/}
+        <div className="w-full flex justify-center">
           <button
             onClick={handleEditClick}
-            className="bg-accent hover:bg-accent/80 text-accent-foreground rounded-full p-3 flex items-center justify-center"
+            className="bg-accent hover:bg-accent/80 text-accent-foreground rounded-full p-3 flex items-center justify-center opacity-20 hover:opacity-80"
             aria-label="Edit page"
             title="Edit page"
           >
-            <FaPencilAlt className="text-accent-foreground" />
+            <FaPencilAlt className="text-accent-foreground/90" />
           </button>
         </div>
         

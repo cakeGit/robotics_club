@@ -159,10 +159,10 @@ const Editor = () => {
   const handleBack = () => {
     if (hasChanges) {
       if (window.confirm('You have unsaved changes. Do you want to discard them?')) {
-        navigate(`/docs/${path.replace(/\\/g, '/')}`);
+        navigate(`/docs/${path.replace(/\\/g, '/')}.md`);
       }
     } else {
-      navigate(`/docs/${path.replace(/\\/g, '/')}`);
+      navigate(`/docs/${path.replace(/\\/g, '/')}.md`);
     }
   };
   

@@ -60,7 +60,7 @@ const EmailModal = ({ isOpen, onClose, onSubmit }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-destructive border-l-4 border-destructive text-destructive-foreground p-4 mb-4">
+            <div className="bg-destructive/10 border-l-4 border-destructive text-destructive-foreground p-4 mb-4">
               {error}
             </div>
           )}
