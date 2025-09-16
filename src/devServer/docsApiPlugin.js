@@ -65,6 +65,7 @@ function createExpressLike(nodeReq, nodeRes) {
                 `http://${nodeReq.headers.host}`
             ).searchParams.entries()
         ),
+        raw: nodeReq, // Expose raw request if needed
     };
 
     // Minimal res helpers used by our handlers

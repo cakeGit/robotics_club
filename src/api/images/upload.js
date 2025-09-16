@@ -42,7 +42,7 @@ export default async function handler(req, res) {
             uploadDir: imagesDir,
         });
 
-        form.parse(req, async (err, fields, files) => {
+        form.parse(req.raw || req, async (err, fields, files) => {
             if (err) {
                 console.error("Error parsing form:", err);
                 return res.status(500).json({
