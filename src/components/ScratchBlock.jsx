@@ -57,19 +57,19 @@ export default function ScratchBlock({ code }) {
   };
 
   return (
-    <div className="scratch-block-wrapper bg-gray-900 text-white border border-gray-700 rounded-lg shadow-lg p-2 bg-gray-800 m-4">
+    <div className="scratch-block-wrapper bg-card text-foreground border border-border rounded-lg p-2 m-4">
       <div className="px-4">
         <div className="header flex justify-between items-center">
-            <span className="text-xs font-medium text-gray-300">Scratch code</span>
-            <button onClick={() => setOpen(!open)} title="Toggle source view" aria-expanded={open} className="text-gray-400 hover:text-white text-xs">&lt;/&gt;</button>
+            <span className="text-xs font-medium text-muted-foreground">Scratch code</span>
+            <button onClick={() => setOpen(!open)} title="Toggle source view" aria-expanded={open} className="text-muted-foreground hover:text-foreground text-xs">&lt;/&gt;</button>
         </div>
       </div>
       <div className="content relative overflow-hidden rounded">
         <div className="svg-container px-4 pb-4 min-h-32">
-          <div ref={svgRef} className="scratch-svg border border-gray-600 rounded block p-4 flex justify-center items-center bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,.1)_1px,transparent_0)] bg-[length:20px_20px]" aria-hidden={!open} />
+          <div ref={svgRef} className="scratch-svg border border-border rounded block p-4 flex justify-center items-center bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,.05)_1px,transparent_0)] bg-[length:20px_20px]" aria-hidden={!open} />
         </div>
-        <div className={`source-overlay absolute top-0 left-0 w-full h-full bg-gray-800 p-4 transform transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
-          <pre className="whitespace-pre-wrap font-mono text-sm text-gray-100 h-full overflow-auto">{code}</pre>
+        <div className={`source-overlay absolute top-0 left-0 w-full h-full bg-muted p-4 transform transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
+          <pre className="whitespace-pre-wrap font-mono text-sm text-foreground h-full overflow-auto">{code}</pre>
         </div>
       </div>
     </div>

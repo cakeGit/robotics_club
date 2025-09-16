@@ -16,6 +16,8 @@ const EmailVerification = () => {
           headers: {
             'Accept': 'application/json',
           },
+          // Ensure cookies set by the server are accepted by the browser
+          credentials: 'include',
         });
 
         const data = await response.json();
@@ -49,10 +51,10 @@ const EmailVerification = () => {
 
   // Show a loading message while verifying
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="text-center">
+    <div className="flex justify-center items-center h-screen bg-background">
+      <div className="text-center text-foreground">
         <h2 className="text-xl font-bold mb-4">Verifying your email...</h2>
-        <p>Please wait, you'll be redirected shortly.</p>
+        <p className="text-muted-foreground">Please wait, you'll be redirected shortly.</p>
       </div>
     </div>
   );

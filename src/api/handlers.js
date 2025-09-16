@@ -133,3 +133,33 @@ export function handleVerifyEmailApi(req, res) {
         );
     }
 }
+
+// Handle auth check (validate authToken cookie)
+export function handleCheckAuthApi(req, res) {
+    try {
+        const cookieHeader = req.headers.cookie || "";
+        const match = cookieHeader
+            .split(";")
+            .map((c) => c.trim())
+            .find((c) => c.startsWith("authToken="));
+
+        if (!match) {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            return res.end(JSON.stringify({ authenticated: false }));
+        }
+
+        const token = match.substring("authToken=".length);
+        try {
+            const email = verifyToken(token);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            return res.end(JSON.stringify({ authenticated: true, email }));
+        } catch (err) {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            return res.end(JSON.stringify({ authenticated: false }));
+        }
+    } catch (error) {
+        console.error("Error in check auth API:", error);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ authenticated: false }));
+    }
+}

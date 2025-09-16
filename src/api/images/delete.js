@@ -1,8 +1,8 @@
-import { handleSaveDocument } from "../../lib/api/apiHandlers";
+import { handleDeleteImage } from "../../lib/api/apiHandlers";
 import { verifyToken } from "../../lib/auth/server/authService.server";
 
 export default async function handler(req, res) {
-    if (req.method === "POST") {
+    if (req.method === "DELETE") {
         // Check for authentication token
         const authToken = req.cookies?.authToken;
 
@@ -16,33 +16,31 @@ export default async function handler(req, res) {
             // Verify token
             verifyToken(authToken);
 
-            const { filePath, content } = req.body;
+            const { imageName } = req.query;
 
-            if (!filePath || !content) {
+            if (!imageName) {
                 return res.status(400).json({
                     success: false,
-                    message: "File path and content are required",
+                    message: "Image name is required",
                 });
             }
 
-            const result = await handleSaveDocument(
-                filePath,
-                content,
-                authToken
-            );
+            const result = await handleDeleteImage(imageName, authToken);
 
             if (result.success) {
-                res.status(200).json(result);
+                return res.status(200).json(result);
             } else {
-                res.status(400).json(result);
+                return res
+                    .status(result.code === "NOT_FOUND" ? 404 : 400)
+                    .json(result);
             }
         } catch (error) {
-            res.status(401).json({
+            return res.status(401).json({
                 success: false,
                 message: "Invalid authentication token",
             });
         }
     } else {
-        res.status(405).json({ message: "Method not allowed" });
+        return res.status(405).json({ message: "Method not allowed" });
     }
 }

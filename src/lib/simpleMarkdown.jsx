@@ -54,6 +54,13 @@ export function tokenize(md) {
       continue;
     }
 
+    const imageMatch = line.match(/^!\[(.*)\]\((.*)\)$/);
+    if (imageMatch) {
+      tokens.push({ type: 'image', src: imageMatch[2], alt: imageMatch[1] });
+      i += 1;
+      continue;
+    }
+
     // paragraph
     const paraLines = [line.trim()];
     i += 1;
@@ -85,6 +92,41 @@ export function renderTokens(tokens) {
       } else {
         elements.push(React.createElement('pre', { key: `code-${idx}`, style: { background: '#f3f3f3', padding: '0.5rem' } }, t.code));
       }
+    } else if (t.type === 'image') {
+      elements.push(
+        React.createElement('div', {
+          key: `img-${idx}`,
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative',
+          },
+        },
+        React.createElement('img', {
+          src: t.src,
+          alt: t.alt,
+          style: {
+            maxWidth: '100%',
+            height: 'auto',
+            display: 'block',
+            margin: '0 auto',
+          },
+        }),
+        React.createElement('div', {
+          style: {
+            position: 'absolute',
+            bottom: '0',
+            background: 'rgba(0, 0, 0, 0.7)',
+            color: '#fff',
+            padding: '0.5rem',
+            textAlign: 'center',
+            transition: 'opacity 0.3s',
+            pointerEvents: 'none',
+          },
+          className: 'image-caption',
+        }, t.alt))
+      );
     }
   });
   return elements;

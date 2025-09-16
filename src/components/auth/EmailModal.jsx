@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { validateEmailFormat } from '../../lib/auth/authService';
+import PopupWrapper from '../common/PopupWrapper';
 
 const EmailModal = ({ isOpen, onClose, onSubmit }) => {
   const [email, setEmail] = useState('');
@@ -51,69 +52,56 @@ const EmailModal = ({ isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Sign In to Edit</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Close"
-          >
-            <FaTimes />
-          </button>
+    <PopupWrapper isOpen={isOpen} onClose={onClose} title="Sign In to Edit">
+      {success ? (
+        <div className="bg-primary/10 border-l-4 border-primary text-foreground p-4 mb-4">
+          {success}
         </div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-destructive border-l-4 border-destructive text-destructive-foreground p-4 mb-4">
+              {error}
+            </div>
+          )}
 
-        {success ? (
-          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-            {success}
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-foreground mb-2">
+              Enter your email address:
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 bg-muted border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+              placeholder="your-email@example.com"
+              required
+            />
+            <p className="text-sm text-muted-foreground mt-2">
+              Please enter your authorized email address to receive a sign-in link.
+            </p>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                {error}
-              </div>
-            )}
 
-            <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-700 mb-2">
-                Enter your email address:
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="your-email@example.com"
-                required
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Please enter your authorized email address to receive a sign-in link.
-              </p>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md mr-2 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Sending...' : 'Send Verification Email'}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-foreground border border-border rounded-md mr-2 hover:bg-accent"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Sending...' : 'Send Verification Email'}
+            </button>
+          </div>
+        </form>
+      )}
+    </PopupWrapper>
   );
 };
 

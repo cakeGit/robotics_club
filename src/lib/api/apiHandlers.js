@@ -47,6 +47,11 @@ const getDataDirectory = () => {
     return path.join(process.cwd(), "data", "pages");
 };
 
+// Get the absolute path to the images directory
+export const getImagesDirectory = () => {
+    return path.join(process.cwd(), "data", "images");
+};
+
 // Validate and resolve file path
 const resolveDocPath = (filePath) => {
     // Make sure the filePath is relative to data/pages
@@ -171,6 +176,199 @@ export const handleListDocuments = async () => {
         return {
             success: false,
             message: error.message || "Failed to list documents",
+        };
+    }
+};
+
+// Delete document
+export const handleDeleteDocument = async (filePath, token) => {
+    try {
+        // Verify authentication
+        verifyToken(token);
+
+        const absPath = resolveDocPath(filePath);
+
+        // Delete the file
+        await fs.unlink(absPath);
+
+        // Delete hanging directories if empty
+        let currentDir = path.dirname(absPath);
+        const dataDir = getDataDirectory();
+        while (currentDir.startsWith(dataDir)) {
+            const files = await fs.readdir(currentDir);
+            if (files.length === 0) {
+                await fs.rmdir(currentDir);
+                currentDir = path.dirname(currentDir);
+            } else {
+                break;
+            }
+        }
+
+        return { success: true, message: "Document deleted", path: absPath };
+    } catch (error) {
+        console.error("Error deleting document:", error);
+        if (error.code === "ENOENT") {
+            return {
+                success: false,
+                message: "Document not found",
+                code: "NOT_FOUND",
+                path: filePath,
+            };
+        }
+        return {
+            success: false,
+            message: error.message || "Failed to delete document",
+            path: filePath,
+        };
+    }
+};
+
+// List all images in the images directory
+export const handleListImages = async () => {
+    try {
+        const imagesDir = getImagesDirectory();
+
+        // Create the directory if it doesn't exist
+        await fs.mkdir(imagesDir, { recursive: true });
+
+        const entries = await fs.readdir(imagesDir, { withFileTypes: true });
+
+        const images = await Promise.all(
+            entries.map(async (entry) => {
+                // Make sure we're only processing files, not directories
+                if (entry.isFile()) {
+                    try {
+                        const filePath = path.join(imagesDir, entry.name);
+                        const stats = await fs.stat(filePath);
+
+                        // Get file extension
+                        const ext = path.extname(entry.name).toLowerCase();
+                        const isImage = [
+                            ".jpg",
+                            ".jpeg",
+                            ".png",
+                            ".gif",
+                            ".svg",
+                            ".webp",
+                        ].includes(ext);
+
+                        if (isImage) {
+                            // Encode the filename to handle special characters
+                            const encodedName = encodeURIComponent(entry.name);
+                            return {
+                                name: entry.name,
+                                path: `/data/images/${encodedName}`,
+                                size: stats.size,
+                                lastModified: stats.mtime,
+                            };
+                        }
+                    } catch (err) {
+                        console.error(
+                            `Error processing file ${entry.name}:`,
+                            err
+                        );
+                        return null;
+                    }
+                }
+                return null;
+            })
+        );
+
+        return {
+            success: true,
+            images: images.filter((img) => img !== null),
+        };
+    } catch (error) {
+        console.error("Error listing images:", error);
+        return {
+            success: false,
+            message: error.message || "Failed to list images",
+        };
+    }
+};
+
+// Delete image
+export const handleDeleteImage = async (imageName, token) => {
+    try {
+        // Verify authentication
+        verifyToken(token);
+
+        const imagesDir = getImagesDirectory();
+        const filePath = path.join(imagesDir, path.basename(imageName));
+
+        // Check if the file exists
+        try {
+            await fs.access(filePath);
+        } catch (e) {
+            return {
+                success: false,
+                message: "Image not found",
+                code: "NOT_FOUND",
+            };
+        }
+
+        // Delete the file
+        await fs.unlink(filePath);
+
+        return {
+            success: true,
+            message: "Image deleted successfully",
+        };
+    } catch (error) {
+        console.error("Error deleting image:", error);
+        return {
+            success: false,
+            message: error.message || "Failed to delete image",
+        };
+    }
+};
+
+// Rename image
+export const handleRenameImage = async (oldName, newName, token) => {
+    try {
+        // Verify authentication
+        verifyToken(token);
+
+        const imagesDir = getImagesDirectory();
+        const oldPath = path.join(imagesDir, path.basename(oldName));
+        const newPath = path.join(imagesDir, path.basename(newName));
+
+        // Check if the source file exists
+        try {
+            await fs.access(oldPath);
+        } catch (e) {
+            return {
+                success: false,
+                message: "Source image not found",
+                code: "NOT_FOUND",
+            };
+        }
+
+        // Check if the destination file already exists
+        try {
+            await fs.access(newPath);
+            return {
+                success: false,
+                message: "A file with the new name already exists",
+                code: "DUPLICATE",
+            };
+        } catch (e) {
+            // This is expected if the file doesn't exist
+        }
+
+        // Rename the file
+        await fs.rename(oldPath, newPath);
+
+        return {
+            success: true,
+            message: "Image renamed successfully",
+            newPath: `/data/images/${path.basename(newName)}`,
+        };
+    } catch (error) {
+        console.error("Error renaming image:", error);
+        return {
+            success: false,
+            message: error.message || "Failed to rename image",
         };
     }
 };

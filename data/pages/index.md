@@ -1,5 +1,5 @@
-# Welcome to Robotics Club Documentation
-
+# Welcome to Robotics Club!
+![Awesome mindstorms robot](/data/images/k8hzrxteitsdn5avcf292r18e.png)
 This is the main documentation page for our robotics club projects and
 tutorials.
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MarkdownContent from './MarkdownContent';
-import { isAuthenticated } from '../../lib/auth/authService';
+import { isAuthenticated, clearAuthCookie, checkAuth } from '../../lib/auth/authService';
 import { FaPencilAlt } from 'react-icons/fa';
 import EmailModal from '../auth/EmailModal';
 // Removed bundled fallback data. If the API is unavailable we'll show an empty sidebar.
@@ -31,7 +31,16 @@ const DocLayout = () => {
   
   // Check authentication status on component mount
   useEffect(() => {
-    setUserAuthenticated(isAuthenticated());
+    // Prefer server-side check (works for HttpOnly cookies), fall back to client cookie
+    (async () => {
+      const serverOk = await checkAuth();
+      if (serverOk) {
+        setUserAuthenticated(true);
+        return;
+      }
+
+      setUserAuthenticated(isAuthenticated());
+    })();
   }, []);
 
   const fetchSidebarItems = async () => {
@@ -115,11 +124,11 @@ const DocLayout = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen w-full text-lg bg-white dark:bg-gray-900">Loading documentation...</div>;
+    return <div className="flex justify-center items-center h-screen w-full text-lg bg-background text-foreground">Loading documentation...</div>;
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-screen w-full text-lg text-red-600 bg-white dark:bg-gray-900">{error}</div>;
+    return <div className="flex justify-center items-center h-screen w-full text-lg text-destructive bg-background">{error}</div>;
   }
 
   // If no path is specified, default to index
@@ -138,23 +147,28 @@ const DocLayout = () => {
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
-      <Sidebar 
-        items={sidebarItems} 
+      <Sidebar
+        items={sidebarItems}
         currentPath={currentPath}
         onNavigate={(path) => navigate(`/docs/${path}`)}
+        userAuthenticated={userAuthenticated}
+        onSignOut={() => {
+          clearAuthCookie();
+          setUserAuthenticated(false);
+        }}
       />
-      <main className="flex-1 p-8 overflow-y-auto bg-white dark:bg-gray-900 relative">
+      <main className="flex-1 p-8 overflow-y-auto bg-background relative">
         <MarkdownContent path={currentPath} />
         
         {/* Edit button */}
         <div className="absolute bottom-8 right-8">
           <button
             onClick={handleEditClick}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full p-3 flex items-center justify-center fill-gray-700 dark:bg-gray-800 dark:hover:bg-white-200"
+            className="bg-accent hover:bg-accent/80 text-accent-foreground rounded-full p-3 flex items-center justify-center"
             aria-label="Edit page"
             title="Edit page"
           >
-            <FaPencilAlt className="fill-gray-700 dark:fill-gray-200" />
+            <FaPencilAlt className="text-accent-foreground" />
           </button>
         </div>
         

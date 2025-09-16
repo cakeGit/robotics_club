@@ -25,7 +25,10 @@ const MarkdownContent = ({ path }) => {
       
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Page not found');
+          // Immediately show a not-found page without retrying
+          setContent('# Not Found\n\nThe requested documentation page could not be found.');
+          setLoading(false);
+          return;
         } else {
           throw new Error(`Failed to fetch page: ${response.status}`);
         }
@@ -96,17 +99,17 @@ const MarkdownContent = ({ path }) => {
 
 
   if (loading) {
-    return <div className="flex justify-center items-center p-8 text-lg bg-white dark:bg-gray-900">Loading content...</div>;
+    return <div className="flex justify-center items-center p-8 text-lg bg-background text-foreground">Loading content...</div>;
   }
 
   if (error) {
-    return <div className="flex justify-center items-center p-8 text-lg text-red-600 bg-white dark:bg-gray-900">{error}</div>;
+    return <div className="flex justify-center items-center p-8 text-lg text-destructive bg-background">{error}</div>;
   }
 
   const jsxContent = renderMarkdown(content);
 
   return (
-    <div className="md-root prose prose-slate dark:prose-invert max-w-3xl mx-auto">
+    <div className="md-root prose prose-invert max-w-3xl mx-auto">
       {jsxContent}
     </div>
   );

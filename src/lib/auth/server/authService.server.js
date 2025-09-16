@@ -32,6 +32,10 @@ const AUTHORIZED_EMAILS = (
 // Default sender email (first in the list)
 const SENDER_EMAIL = process.env.SENDER_EMAIL || AUTHORIZED_EMAILS[0];
 
+// Default no-reply address used for outgoing verification emails. Allow override.
+const NOREPLY_EMAIL =
+    process.env.NOREPLY_EMAIL || "robotics-club-noreply@oreostack.uk";
+
 /**
  * Generate a JWT token for a given email
  */
@@ -96,11 +100,11 @@ export const sendVerificationEmail = async (email, token) => {
     }
 
     // Create verification URL with token
-    const baseUrl = process.env.APP_URL || "http://localhost:3000";
+    const baseUrl = process.env.APP_URL || "http://localhost:5173";
     const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
 
     const mailOptions = {
-        from: SENDER_EMAIL,
+        from: NOREPLY_EMAIL,
         to: email,
         subject: "Robotics Club Docs - Verify your email",
         html: `

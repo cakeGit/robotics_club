@@ -13,14 +13,20 @@ export default function handler(req, res) {
         const result = handleVerifyEmail(token);
 
         if (result.success) {
-            // Set the JWT token as an HTTP-only cookie
+            // Determine cookie attributes: during local development allow client-side access
+            const isLocalhost =
+                req.headers.host && req.headers.host.includes("localhost");
+            const maxAge = 60 * 60 * 24; // 24 hours in seconds
+
+            // If running on localhost, omit HttpOnly and Secure so client-side JS can read the cookie
+            // In production, keep HttpOnly and Secure for safety
+            const cookieAttributes = isLocalhost
+                ? `Path=/; SameSite=Strict; Max-Age=${maxAge}`
+                : `Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;
+
             res.setHeader(
                 "Set-Cookie",
-                `authToken=${
-                    result.token
-                }; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${
-                    60 * 60 * 24
-                }`
+                `authToken=${result.token}; ${cookieAttributes}`
             );
 
             // Return success status with email

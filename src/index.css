@@ -2,39 +2,89 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
-  --background: oklch(0.2115 0.0060 301.0350);
-  --foreground: oklch(0.8109 0 0);
-  --card: oklch(0.1822 0 0);
-  --card-foreground: oklch(0.8109 0 0);
-  --popover: oklch(0.2115 0.0060 301.0350);
-  --popover-foreground: oklch(0.8109 0 0);
-  --primary: oklch(0.6469 0.1544 40.4738);
-  --primary-foreground: oklch(0.2115 0.0060 301.0350);
-  --secondary: oklch(0.5403 0.0370 188.9168);
-  --secondary-foreground: oklch(0.2115 0.0060 301.0350);
-  --muted: oklch(0.2520 0 0);
-  --muted-foreground: oklch(0.6268 0 0);
-  --accent: oklch(0.3211 0 0);
-  --accent-foreground: oklch(0.8109 0 0);
-  --destructive: oklch(0.5403 0.0370 188.9168);
-  --destructive-foreground: oklch(0.2115 0.0060 301.0350);
-  --border: oklch(0.2115 0.0060 301.0350);
-  --input: oklch(0.2520 0 0);
-  --ring: oklch(0.6469 0.1544 40.4738);
-  --chart-1: oklch(0.5403 0.0370 188.9168);
-  --chart-2: oklch(0.6469 0.1544 40.4738);
-  --chart-3: oklch(0.7935 0.1110 56.8261);
-  --chart-4: oklch(0.6268 0 0);
-  --chart-5: oklch(0.6830 0 0);
-  --sidebar: oklch(0.1822 0 0);
-  --sidebar-foreground: oklch(0.8109 0 0);
-  --sidebar-primary: oklch(0.6469 0.1544 40.4738);
-  --sidebar-primary-foreground: oklch(0.2115 0.0060 301.0350);
-  --sidebar-accent: oklch(0.3211 0 0);
-  --sidebar-accent-foreground: oklch(0.8109 0 0);
-  --sidebar-border: oklch(0.2520 0 0);
-  --sidebar-ring: oklch(0.6469 0.1544 40.4738);
+  --background: #ffffff;
+  --foreground: #101823;
+  --card: #ffffff;
+  --card-foreground: #101823;
+  --popover: #ffffff;
+  --popover-foreground: #101823;
+  --primary: #c85b34;
+  --primary-foreground: #ffffff;
+  --secondary: #4b6764;
+  --secondary-foreground: #ffffff;
+  --muted: #d5d9de;
+  --muted-foreground: #606771;
+  --accent: #eeeeee;
+  --accent-foreground: #101823;
+  --destructive: #e22f41;
+  --destructive-foreground: #fafafa;
+  --border: #c9ced4;
+  --input: #c9ced4;
+  --ring: #c85b34;
+  --chart-1: #567673;
+  --chart-2: #da683d;
+  --chart-3: #f2a973;
+  --chart-4: #888888;
+  --chart-5: #999999;
+  --sidebar: #d5d9de;
+  --sidebar-foreground: #101823;
+  --sidebar-primary: #c85b34;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ffffff;
+  --sidebar-accent-foreground: #101823;
+  --sidebar-border: #c9ced4;
+  --sidebar-ring: #c85b34;
+  --font-sans: Geist Mono, ui-monospace, monospace;
+  --font-serif: serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.75rem;
+  --shadow-2xs: 0px 1px 7px 0px hsl(0 0% 0% / 0.39);
+  --shadow-xs: 0px 1px 7px 0px hsl(0 0% 0% / 0.39);
+  --shadow-sm: 0px 1px 7px 0px hsl(0 0% 0% / 0.77), 0px 1px 2px -1px hsl(0 0% 0% / 0.77);
+  --shadow: 0px 1px 7px 0px hsl(0 0% 0% / 0.77), 0px 1px 2px -1px hsl(0 0% 0% / 0.77);
+  --shadow-md: 0px 1px 7px 0px hsl(0 0% 0% / 0.77), 0px 2px 4px -1px hsl(0 0% 0% / 0.77);
+  --shadow-lg: 0px 1px 7px 0px hsl(0 0% 0% / 0.77), 0px 4px 6px -1px hsl(0 0% 0% / 0.77);
+  --shadow-xl: 0px 1px 7px 0px hsl(0 0% 0% / 0.77), 0px 8px 10px -1px hsl(0 0% 0% / 0.77);
+  --shadow-2xl: 0px 1px 7px 0px hsl(0 0% 0% / 1.93);
+  --tracking-normal: 0rem;
+  --spacing: 0.18rem;
+}
+
+.dark {
+  --background: #19181b;
+  --foreground: #c1c1c1;
+  --card: #121212;
+  --card-foreground: #c1c1c1;
+  --popover: #19181b;
+  --popover-foreground: #c1c1c1;
+  --primary: #da683d;
+  --primary-foreground: #c1c1c1;
+  --secondary: #567673;
+  --secondary-foreground: #c1c1c1;
+  --muted: #222222;
+  --muted-foreground: #888888;
+  --accent: #333333;
+  --accent-foreground: #c1c1c1;
+  --destructive: #567673;
+  --destructive-foreground: #c1c1c1;
+  --border: #19181b;
+  --input: #222222;
+  --ring: #da683d;
+  --chart-1: #567673;
+  --chart-2: #da683d;
+  --chart-3: #f2a973;
+  --chart-4: #888888;
+  --chart-5: #999999;
+  --sidebar: #121212;
+  --sidebar-foreground: #c1c1c1;
+  --sidebar-primary: #da683d;
+  --sidebar-primary-foreground: #c1c1c1;
+  --sidebar-accent: #333333;
+  --sidebar-accent-foreground: #c1c1c1;
+  --sidebar-border: #222222;
+  --sidebar-ring: #da683d;
   --font-sans: Geist Mono, ui-monospace, monospace;
   --font-serif: serif;
   --font-mono: JetBrains Mono, monospace;
@@ -152,13 +202,13 @@ body {
 }
 
 .md-root h2 {
-  color: var(--color-sky-500);
+  color: var(--color-secondary);
   font-size: 1.5rem;
   margin-bottom: 0.6rem;
 }
 
 .md-root h3 {
-  color: var(--color-sky-400);
+  color: var(--color-secondary);
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
 }
@@ -186,4 +236,16 @@ body {
   padding: 0.12rem 0.3rem;
   border-radius: 0.25rem;
   font-family: var(--font-mono);
+}
+
+/* Add styles for image captions on hover */
+.image-caption {
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* Display the caption on hover */
+div:hover > .image-caption {
+  opacity: 1;
 }

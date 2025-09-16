@@ -10,6 +10,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "archiver": "^5.3.1",
         "@monaco-editor/react": "^4.7.0",
         "@tailwindcss/postcss": "^4.1.13",
         "dotenv": "^17.2.2",
@@ -23,15 +24,13 @@
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "react-icons": "^5.5.0",
-        "react-markdown": "^9.0.1",
-        "react-split": "^2.0.14",
-        "react-syntax-highlighter": "^15.5.0",
-        "uuid": "^9.0.1",
         "react-markdown": "^10.1.0",
-        "react-router-dom": "^7.9.1",
         "react-split": "^2.0.14",
         "react-syntax-highlighter": "^15.6.6",
-        "scratchblocks": "^3.6.4"
+        "uuid": "^9.0.1",
+        "react-router-dom": "^7.9.1",
+        "scratchblocks": "^3.6.4",
+        "formidable": "^3.5.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.33.0",

@@ -69,6 +69,10 @@ const ensureDataDirs = async () => {
     const pagesDir = path.join(__dirname, "data", "pages");
     await fs.ensureDir(pagesDir);
 
+    // Ensure images directory exists
+    const imagesDir = path.join(__dirname, "data", "images");
+    await fs.ensureDir(imagesDir);
+
     // Create a sample markdown file if the directory is empty
     const files = await fs.readdir(pagesDir);
     if (files.length === 0) {
@@ -87,166 +91,92 @@ const ensureDataDirs = async () => {
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [
-        // Custom plugin to handle API routes
+        // Custom plugin to handle API routes (moved to src/devServer/docsApiPlugin.js)
         {
             name: "docs-api-plugin",
-            configureServer(server) {
-                // Ensure data directories exist
-                ensureDataDirs().catch((err) => {
-                    console.error("Failed to ensure data directories:", err);
-                });
+            async configureServer(server) {
+                try {
+                    // Create images directory if it doesn't exist
+                    const imagesDir = path.join(__dirname, "data", "images");
+                    await fs.ensureDir(imagesDir);
 
-                // Handle API routes
-                server.middlewares.use((req, res, next) => {
-                    // Page index endpoint
-                    if (req.method === "GET" && req.url === "/api/page_index") {
-                        handlePageIndex(req, res);
-                        return;
-                    }
+                    // Serve static files from data directory
+                    server.middlewares.use("/data", (req, res, next) => {
+                        const urlPath = decodeURIComponent(req.url);
+                        // Only serve from the images subdirectory
+                        if (urlPath.startsWith("/images/")) {
+                            try {
+                                const fileName = path.basename(urlPath);
+                                const filePath = path.join(
+                                    __dirname,
+                                    "data",
+                                    "images",
+                                    fileName
+                                );
 
-                    // Page content endpoint
-                    if (
-                        req.method === "GET" &&
-                        req.url.startsWith("/api/page/")
-                    ) {
-                        handlePageContent(req, res);
-                        return;
-                    }
+                                // Check if file exists before attempting to read it
+                                if (
+                                    fs.existsSync(filePath) &&
+                                    fs.statSync(filePath).isFile()
+                                ) {
+                                    // Set appropriate content type based on file extension
+                                    const ext = path
+                                        .extname(fileName)
+                                        .toLowerCase();
+                                    const contentTypes = {
+                                        ".jpg": "image/jpeg",
+                                        ".jpeg": "image/jpeg",
+                                        ".png": "image/png",
+                                        ".gif": "image/gif",
+                                        ".svg": "image/svg+xml",
+                                        ".webp": "image/webp",
+                                    };
 
-                    // Email verification endpoints
-                    if (req.url === "/api/auth/send-verification-email") {
-                        import("./src/api/handlers.js")
-                            .then(({ handleSendVerificationEmailApi }) => {
-                                handleSendVerificationEmailApi(req, res);
-                            })
-                            .catch((error) => {
+                                    if (contentTypes[ext]) {
+                                        res.setHeader(
+                                            "Content-Type",
+                                            contentTypes[ext]
+                                        );
+                                    }
+
+                                    const fileStream =
+                                        fs.createReadStream(filePath);
+                                    fileStream.on("error", (err) => {
+                                        console.error(
+                                            `Error reading file ${filePath}:`,
+                                            err
+                                        );
+                                        res.statusCode = 500;
+                                        res.end("Error reading file");
+                                    });
+                                    fileStream.pipe(res);
+                                    return;
+                                }
+                            } catch (err) {
                                 console.error(
-                                    "Error handling verification email:",
-                                    error
+                                    `Error serving file from ${urlPath}:`,
+                                    err
                                 );
-                                res.writeHead(500, {
-                                    "Content-Type": "application/json",
-                                });
-                                res.end(
-                                    JSON.stringify({
-                                        success: false,
-                                        message: "Server error",
-                                    })
-                                );
-                            });
-                        return;
-                    }
+                            }
+                        }
+                        next();
+                    });
 
-                    if (req.url.startsWith("/api/auth/verify-email")) {
-                        import("./src/api/handlers.js")
-                            .then(({ handleVerifyEmailApi }) => {
-                                handleVerifyEmailApi(req, res);
-                            })
-                            .catch((error) => {
-                                console.error(
-                                    "Error handling email verification:",
-                                    error
-                                );
-                                res.writeHead(500, {
-                                    "Content-Type": "application/json",
-                                });
-                                res.end(
-                                    JSON.stringify({
-                                        success: false,
-                                        message: "Server error",
-                                    })
-                                );
-                            });
-                        return;
+                    const mod = await import(
+                        "./src/devServer/docsApiPlugin.js"
+                    );
+                    if (mod && typeof mod.setupDocsApiRoutes === "function") {
+                        mod.setupDocsApiRoutes(server);
+                    } else {
+                        console.error(
+                            "docs-api-plugin: setupDocsApiRoutes not found in module"
+                        );
                     }
-
-                    // Not an API route, continue
-                    next();
-                });
+                } catch (err) {
+                    console.error("Failed to setup docs API routes:", err);
+                }
             },
         },
         react(),
     ],
 });
-
-// Handler for page index API
-async function handlePageIndex(req, res) {
-    console.log("API: Processing page index request");
-    try {
-        const pagesDir = path.join(__dirname, "data", "pages");
-
-        // Ensure directory exists
-        if (!(await fs.pathExists(pagesDir))) {
-            await fs.ensureDir(pagesDir);
-        }
-
-        const tree = await createDirectoryTree(pagesDir);
-        console.log("API: Generated file tree");
-
-        res.writeHead(200, {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache",
-        });
-        res.end(JSON.stringify(tree));
-    } catch (error) {
-        console.error("API: Error getting page index:", error);
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(
-            JSON.stringify({
-                error: "Failed to get page index",
-                message: error.message,
-            })
-        );
-    }
-}
-
-// Handler for page content API
-async function handlePageContent(req, res) {
-    try {
-        const pagePath = req.url.substring("/api/page/".length);
-        console.log("API: Processing page content request:", pagePath);
-
-        const fullPath = path.join(__dirname, "data", "pages", pagePath);
-        console.log("API: Looking for file:", fullPath);
-
-        if (!(await fs.pathExists(fullPath))) {
-            console.log("API: File not found:", fullPath);
-            res.writeHead(404, { "Content-Type": "application/json" });
-            return res.end(
-                JSON.stringify({
-                    error: "Page not found",
-                    path: pagePath,
-                })
-            );
-        }
-
-        if (!(await fs.stat(fullPath)).isFile()) {
-            console.log("API: Not a file:", fullPath);
-            res.writeHead(400, { "Content-Type": "application/json" });
-            return res.end(
-                JSON.stringify({
-                    error: "Not a file",
-                    path: pagePath,
-                })
-            );
-        }
-
-        const content = await fs.readFile(fullPath, "utf-8");
-        console.log("API: Read file content, length:", content.length);
-
-        res.writeHead(200, {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache",
-        });
-        res.end(JSON.stringify({ content }));
-    } catch (error) {
-        console.error("API: Error getting page content:", error);
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(
-            JSON.stringify({
-                error: "Failed to get page content",
-                message: error.message,
-            })
-        );
-    }
-}
