@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  robotics_club:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AUTHORIZED_EMAILS=${AUTHORIZED_EMAILS}
+      - JWT_SECRET=${JWT_SECRET}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - SENDER_EMAIL=${SENDER_EMAIL}
+      - SEND_FROM_EMAIL=${SEND_FROM_EMAIL}
+    restart: unless-stopped

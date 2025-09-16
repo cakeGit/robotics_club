@@ -1,102 +1,108 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { renderMarkdown } from '../../lib/simpleMarkdown.jsx';
 
 const MarkdownContent = ({ path }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
 
-  const fetchContent = useCallback(async () => {
+  // Guard against concurrent fetches and keep a single retry timer
+  const inFlightRef = useRef(false);
+  const retryTimerRef = useRef(null);
+
+  const fetchContent = useCallback(async (attempt = 1, isRetry = false) => {
+    if (inFlightRef.current) {
+      console.log('Fetch already in progress; skipping duplicate call');
+      return;
+    }
+
+    inFlightRef.current = true;
     try {
-      setLoading(true);
+      if (!isRetry) setLoading(true);
       setError(null);
 
-      // No local fallback data available; proceed to fetch from server
-      
-      // Ensure path is properly formatted for API request
       const formattedPath = path.startsWith('/') ? path.substring(1) : path;
-      console.log(`Fetching page content for: ${formattedPath} (attempt ${retryCount + 1})`);
-      
+      console.log(`Fetching page content for: ${formattedPath} (attempt ${attempt})`);
+
       const response = await fetch(`/api/page/${formattedPath}`, {
         headers: { 'Accept': 'application/json' },
         cache: 'no-store'
       });
-      
+
       if (!response.ok) {
         if (response.status === 404) {
-          // Immediately show a not-found page without retrying
           setContent('# Not Found\n\nThe requested documentation page could not be found.');
           setLoading(false);
           return;
-        } else {
-          throw new Error(`Failed to fetch page: ${response.status}`);
         }
+        throw new Error(`Failed to fetch page: ${response.status}`);
       }
-      
+
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         console.error('Unexpected content type:', contentType);
-        
-        if (retryCount < 2) {
-          console.log(`Retrying content fetch... (${retryCount + 1}/3)`);
-          setRetryCount(prev => prev + 1);
+        if (attempt < 3) {
+          console.log(`Retrying content fetch... (${attempt}/3)`);
+          setLoading(false);
+          setError('Failed to load page content. Retrying...');
+          retryTimerRef.current = setTimeout(() => {
+            fetchContent(attempt + 1, true);
+          }, attempt * 1000);
           return;
         }
-        
         throw new Error(`Expected JSON but got ${contentType}`);
       }
-      
+
       const text = await response.text();
       try {
         const data = JSON.parse(text);
         console.log('Received page content with length:', data.content?.length || 0);
         setContent(data.content || '');
         setLoading(false);
+        setError(null);
       } catch (jsonError) {
         console.error('Invalid JSON response:', text.substring(0, 100) + '...', jsonError);
-        
-        if (retryCount < 2) {
-          console.log(`Retrying after JSON parse error... (${retryCount + 1}/3)`);
-          setRetryCount(prev => prev + 1);
+        if (attempt < 3) {
+          console.log(`Retrying after JSON parse error... (${attempt}/3)`);
+          setLoading(false);
+          setError('Failed to load page content. Retrying...');
+          retryTimerRef.current = setTimeout(() => {
+            fetchContent(attempt + 1, true);
+          }, attempt * 1000);
           return;
         }
-        
         throw new Error('Invalid JSON in server response');
       }
     } catch (err) {
       console.error('Error fetching content:', err);
-
-      // After a couple retries show a not-found message
-      if (retryCount >= 2) {
+      if (attempt >= 3) {
         console.log('Giving up after retries; showing not-found message');
         setContent('# Not Found\n\nThe requested documentation page could not be loaded from the server.');
         setLoading(false);
         setError(null);
       } else {
-        setError(`Failed to load page content. Retrying...`);
-        console.log(`Will retry content fetch in ${retryCount + 1} seconds... (${retryCount + 1}/3)`);
-        setRetryCount(prev => prev + 1);
+        setLoading(false);
+        setError('Failed to load page content. Retrying...');
+        retryTimerRef.current = setTimeout(() => {
+          fetchContent(attempt + 1, true);
+        }, attempt * 1000);
       }
+    } finally {
+      inFlightRef.current = false;
     }
-  }, [path, retryCount]);
+  }, [path]);
 
   useEffect(() => {
-    // Reset retry count when path changes
-    setRetryCount(0);
-    fetchContent();
+    // Clear any pending retry timers when path changes and start a fresh fetch
+    clearTimeout(retryTimerRef.current);
+    fetchContent(1, false);
+
+    return () => {
+      // Cleanup on unmount or path change
+      clearTimeout(retryTimerRef.current);
+      inFlightRef.current = false;
+    };
   }, [path, fetchContent]);
-
-  useEffect(() => {
-    if (retryCount > 0) {
-      const timer = setTimeout(() => {
-        fetchContent();
-      }, retryCount * 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [retryCount, fetchContent]);
-
-
 
   if (loading) {
     return <div className="flex justify-center items-center p-8 text-lg bg-background text-foreground">Loading content...</div>;

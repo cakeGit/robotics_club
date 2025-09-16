@@ -1,5 +1,5 @@
-import { handleRenameImage } from "../../lib/api/apiHandlers";
-import { verifyToken } from "../../lib/auth/server/authService.server";
+import { handleRenameImage } from "../../lib/api/apiHandlers.js";
+import { verifyToken } from "../../lib/auth/server/authService.server.js";
 
 export default async function handler(req, res) {
     if (req.method === "PUT") {

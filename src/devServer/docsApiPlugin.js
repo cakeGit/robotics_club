@@ -46,20 +46,26 @@ const createDirectoryTree = async (dirPath) => {
 // Adapter to provide Express-like `req` and `res` objects for handlers
 function createExpressLike(nodeReq, nodeRes) {
     const url = new URL(nodeReq.url, `http://${nodeReq.headers.host}`);
-
-    const req = Object.create(nodeReq);
-    req.query = Object.fromEntries(url.searchParams.entries());
-
-    // Parse cookies into req.cookies
-    req.cookies = (nodeReq.headers.cookie || "")
-        .split(";")
-        .map((c) => c.trim())
-        .filter(Boolean)
-        .reduce((acc, cur) => {
-            const [k, ...v] = cur.split("=");
-            acc[k] = decodeURIComponent(v.join("="));
-            return acc;
-        }, {});
+    const req = {
+        url: nodeReq.url,
+        method: nodeReq.method,
+        headers: nodeReq.headers,
+        cookies: (nodeReq.headers.cookie || "")
+            .split(";")
+            .map((c) => c.trim())
+            .filter(Boolean)
+            .reduce((acc, cur) => {
+                const [k, ...v] = cur.split("=");
+                acc[k] = decodeURIComponent(v.join("="));
+                return acc;
+            }, {}),
+        query: Object.fromEntries(
+            new URL(
+                nodeReq.url,
+                `http://${nodeReq.headers.host}`
+            ).searchParams.entries()
+        ),
+    };
 
     // Minimal res helpers used by our handlers
     const res = {

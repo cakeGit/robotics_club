@@ -1,0 +1,40 @@
+# Node modules
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist
+
+# Environment files
+.env
+.env.local
+.env.*
+
+# Version control
+.git
+.gitignore
+
+# Editor settings
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Test files
+coverage
+tests
+jest.config.js
+
+# Other unnecessary files
+*.md
+!README.md
+
+# Don't ignore data directory in build stage, but mount as volume in production
+# data is managed by the volume mount in docker-compose.yml

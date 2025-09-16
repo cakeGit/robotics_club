@@ -1,8 +1,8 @@
-import { verifyToken } from "../../lib/auth/server/authService.server";
+import { verifyToken } from "../../lib/auth/server/authService.server.js";
 import fs from "fs";
 import path from "path";
 import formidable from "formidable";
-import { getImagesDirectory } from "../../lib/api/apiHandlers";
+import { getImagesDirectory } from "../../lib/api/apiHandlers.js";
 
 export const config = {
     api: {

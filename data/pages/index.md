@@ -12,6 +12,8 @@ Use the sidebar to navigate through different sections of the documentation.
 The Robotics Club is dedicated to building cool robots, exploring engineering
 and programming.
 
+## Example scratch code blocks
+
 ```scratch
 when [up arrow v] key pressed::event
 motor [C v] turn this way for (100) seconds

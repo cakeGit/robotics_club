@@ -21,11 +21,17 @@ const DocLayout = () => {
 
   // Fetch sidebar items from API
   useEffect(() => {
-    // Add a small delay before fetching to ensure server middleware is ready
+    // Add a small delay before fetching to ensure server middleware is ready.
+    // If server data has been disabled, don't schedule further fetches.
+    if (!useServerData) return;
+
+    // When retryCount is 0 we fetch immediately; otherwise delay by retryCount seconds.
+    const delay = retryCount === 0 ? 0 : retryCount * 1000;
     const timer = setTimeout(() => {
-      fetchSidebarItems();
-    }, retryCount * 1000); // Increase delay with each retry
-    
+      // Don't flip the loading indicator on retries to avoid UI flicker.
+      fetchSidebarItems({ isRetry: retryCount > 0 });
+    }, delay);
+
     return () => clearTimeout(timer);
   }, [retryCount]);
   
@@ -43,18 +49,19 @@ const DocLayout = () => {
     })();
   }, []);
 
-  const fetchSidebarItems = async () => {
+  const fetchSidebarItems = async ({ isRetry = false } = {}) => {
     try {
       if (!useServerData) {
         // Use an empty sidebar when server data is disabled
         console.log('Using empty sidebar (server data disabled)');
         setSidebarItems([]);
         setLoading(false);
-        setError("Failed to fetch documentation structure from server! Refresh the page to retry.");
+        setError('Failed to fetch documentation structure from server. Server data disabled.');
         return;
       }
       
-      setLoading(true);
+      // Only set loading when this is the initial fetch (not a scheduled retry)
+      if (!isRetry) setLoading(true);
       console.log(`Fetching page index... (attempt ${retryCount + 1})`);
       
       const response = await fetch('/api/page_index', {
@@ -84,7 +91,7 @@ const DocLayout = () => {
         throw new Error(`Expected JSON but got ${contentType}`);
       }
       
-      // Read response as text first for better error handling
+  // Read response as text first for better error handling
       const text = await response.text();
       
       try {
@@ -99,6 +106,7 @@ const DocLayout = () => {
         // If we haven't retried too many times, try again
         if (retryCount < 3) {
           console.log(`Retrying after JSON parse error... (${retryCount + 1}/3)`);
+          // Keep loading false to avoid flashing the loading screen.
           setRetryCount(prev => prev + 1);
           return;
         }
@@ -108,14 +116,16 @@ const DocLayout = () => {
     } catch (err) {
       console.error('Error fetching sidebar items:', err);
       
-      // If we've tried 3 times, stop retrying and show empty sidebar
+      // If we've tried 3 times, stop retrying and show a stable error state
       if (retryCount >= 3) {
         console.log('Disabling server data after failed retries');
         setUseServerData(false);
         setSidebarItems([]);
         setLoading(false);
-        setError(null);
+        setError('Failed to load documentation structure after multiple attempts. Showing empty sidebar.');
       } else {
+        // Show a stable non-loading error message while we schedule a retry.
+        setLoading(false);
         setError('Failed to load documentation structure. Retrying...');
         console.log(`Will retry in ${retryCount + 1} seconds... (${retryCount + 1}/3)`);
         setRetryCount(prev => prev + 1);

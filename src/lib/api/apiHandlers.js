@@ -3,7 +3,7 @@ import {
     sendVerificationEmail,
     verifyToken,
     isAuthorizedEmail,
-} from "../auth/server/authService.server";
+} from "../auth/server/authService.server.js";
 import fs from "fs/promises";
 import path from "path";
 
