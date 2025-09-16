@@ -112,7 +112,7 @@ export const sendVerificationEmail = async (email, token) => {
       <p>A request was received to sign into Robotics Club with your email. Click the link below to sign in and edit the documentation:</p>
       <p><a href="${verificationUrl}">Sign In to Edit</a></p>
       <p>This link will expire in 24 hours.</p>
-      <p>If you didn't request this email, please ignore it.</p>
+      <p>If you didn't request this email, please ignore it, or start panicking.</p>
     `,
     };
 

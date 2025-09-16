@@ -4,31 +4,24 @@ import DocLayout from './components/docs/DocLayout'
 import Editor from './components/editor/Editor'
 import EmailVerification from './components/auth/EmailVerification'
 import { isAuthenticated, checkAuth } from './lib/auth/authService'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 
 function HomePage() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div className="max-w-7xl mx-auto p-8 text-center text-foreground">
-        <div className="flex justify-center gap-8">
-          <a href="https://vite.dev" target="_blank" rel="noreferrer" className="transition-transform hover:scale-105">
-            <img src={viteLogo} className="h-24 p-6 transition-all" alt="Vite logo" />
-          </a>
-          <a href="https://react.dev" target="_blank" rel="noreferrer" className="transition-transform hover:scale-105">
-            <img src={reactLogo} className="h-24 p-6 transition-all animate-[spin_20s_linear_infinite]" alt="React logo" />
-          </a>
-        </div>
-        <h1 className="text-5xl font-bold leading-tight mb-4">Robotics Club</h1>
-        <div className="py-8">
-          <button onClick={() => setCount((count) => count + 1)} className="bg-primary hover:bg-primary/80 text-primary-foreground py-2 px-4 rounded transition-colors">
-            count is {count}
-          </button>
-        </div>
+      <div className="max-w-7xl mx-auto p-8 text-center text-foreground flex flex-col items-center justify-center h-screen">
+        <h1 className="text-5xl font-bold leading-tight mb-4">
+          <span className="text-primary">robotics</span>
+          <span className="text-muted-foreground">_</span>
+          <span className="text-secondary">club</span>
+        </h1>
         <p className="mt-8">
-          <a href="/docs" className="text-primary font-medium no-underline transition-colors border border-primary rounded px-4 py-2 hover:bg-primary hover:text-primary-foreground">View Documentation</a>
+          <a
+            href="/docs"
+            className="text-primary font-medium border border-primary rounded px-4 py-2 hover:text-secondary-foreground hover:border-secondary"
+            style={{ boxShadow: '0 0 12px var(--color-primary)' }}
+            onMouseEnter={(e) => e.target.style.boxShadow = '0 0 15px var(--color-secondary)'}
+            onMouseLeave={(e) => e.target.style.boxShadow = '0 0 12px var(--color-primary)'}
+          >Open Documentation</a>
         </p>
       </div>
     </>
@@ -64,7 +57,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/docs" element={<Navigate to="/docs/index.md" replace />} />
         <Route path="/docs/*" element={<DocLayout />} />
-        <Route path="/editor" element={<Navigate to="/editor/index" replace />} />
+        <Route path="/editor" element={<Navigate to="/editor/index.md" replace />} />
         <Route path="/editor/*" element={
           <AuthGuard>
             <Editor />

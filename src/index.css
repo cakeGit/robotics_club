@@ -249,3 +249,5 @@ body {
 div:hover > .image-caption {
   opacity: 1;
 }
+
+@custom-variant hover (&:hover)
