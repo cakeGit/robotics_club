@@ -167,7 +167,7 @@ const DocLayout = () => {
           setUserAuthenticated(false);
         }}
       />
-      <main className="flex-1 p-8 overflow-y-auto bg-background relative">
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto bg-background relative lg:ml-0">
         <MarkdownContent path={currentPath} />
         
         {/* Edit button*/}
