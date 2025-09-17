@@ -109,14 +109,16 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-sidebar text-sidebar-foreground rounded-md border border-sidebar-border hover:bg-sidebar-accent"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        aria-label="Toggle navigation menu"
-      >
-        {isMobileMenuOpen ? <RiCloseLine size={20} /> : <RiMenuLine size={20} />}
-      </button>
+      {/* Mobile Menu Button - Only show when menu is closed */}
+      {!isMobileMenuOpen && (
+        <button
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-sidebar text-sidebar-foreground rounded-md border border-sidebar-border hover:bg-sidebar-accent"
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open navigation menu"
+        >
+          <RiMenuLine size={20} />
+        </button>
+      )}
 
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
@@ -134,7 +136,24 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="sidebar-header p-4 border-b border-sidebar-border flex flex-col items-start">
-          <h2 className="m-0 text-xl font-semibold text-sidebar-foreground">
+          {/* Mobile Close Button - Inside sidebar header */}
+          <div className="lg:hidden w-full flex justify-between items-center mb-3">
+            <h2 className="m-0 text-xl font-semibold text-sidebar-foreground">
+              <span className="text-primary">robotics</span>
+              <span className="text-muted-foreground">_</span>
+              <span className="text-secondary">club</span>
+            </h2>
+            <button
+              onClick={closeMobileMenu}
+              className="p-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-md"
+              aria-label="Close navigation menu"
+            >
+              <RiCloseLine size={20} />
+            </button>
+          </div>
+          
+          {/* Desktop Title */}
+          <h2 className="hidden lg:block m-0 text-xl font-semibold text-sidebar-foreground">
             <span className="text-primary">robotics</span>
             <span className="text-muted-foreground">_</span>
             <span className="text-secondary">club</span>
