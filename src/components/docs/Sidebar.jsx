@@ -136,20 +136,20 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="sidebar-header p-4 border-b border-sidebar-border flex flex-col items-start">
-          {/* Mobile Close Button - Inside sidebar header */}
-          <div className="lg:hidden w-full flex justify-between items-center mb-3">
-            <h2 className="m-0 text-xl font-semibold text-sidebar-foreground">
+          {/* Mobile Header Bar with Close Button */}
+          <div className="lg:hidden w-full flex items-center justify-start mb-3 bg-sidebar">
+            <button
+              onClick={closeMobileMenu}
+              className="mr-3 p-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-md flex-shrink-0"
+              aria-label="Close navigation menu"
+            >
+              <RiCloseLine size={18} />
+            </button>
+            <h2 className="m-0 text-xl font-semibold text-sidebar-foreground flex-1">
               <span className="text-primary">robotics</span>
               <span className="text-muted-foreground">_</span>
               <span className="text-secondary">club</span>
             </h2>
-            <button
-              onClick={closeMobileMenu}
-              className="p-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-md"
-              aria-label="Close navigation menu"
-            >
-              <RiCloseLine size={20} />
-            </button>
           </div>
           
           {/* Desktop Title */}
