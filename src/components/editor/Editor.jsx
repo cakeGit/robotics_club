@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Editor as MonacoEditor } from '@monaco-editor/react';
-import { renderMarkdown } from '../../lib/simpleMarkdown';
 // Using CSS grid instead of Split for stable layout
 import { FaSave, FaArrowLeft, FaImages } from 'react-icons/fa';
 import { isAuthenticated, getAuthCookie } from '../../lib/auth/authService';
 import { checkAuth } from '../../lib/auth/authService';
 import Sidebar from '../docs/Sidebar';
 import ImageGallery from './ImageGallery';
+import { renderMarkdown } from '../../lib/MarkdownBuilder';
 
 const Editor = () => {
   const [content, setContent] = useState('');

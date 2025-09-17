@@ -195,6 +195,13 @@ body {
   padding-left: 0.25rem;
 }
 
+.md-root ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
 .md-root h1 {
   color: var(--color-primary);
   font-size: 2rem;

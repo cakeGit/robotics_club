@@ -162,7 +162,19 @@ const DocLayout = () => {
         currentPath={currentPath}
         onNavigate={(path) => navigate(`/docs/${path}`)}
         userAuthenticated={userAuthenticated}
-        onSignOut={() => {
+        onSignOut={async () => {
+          try {
+            // Ask server to clear the HttpOnly auth cookie/session
+            await fetch('/api/auth/signout', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Accept': 'application/json' }
+            });
+          } catch (err) {
+            console.error('Server signout failed:', err);
+          }
+          
+          // Clear client-side cookie fallback and update UI state
           clearAuthCookie();
           setUserAuthenticated(false);
         }}

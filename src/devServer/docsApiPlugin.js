@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
+import { visibleFileCache } from "../../src/lib/api/apiHandlers.js";
 
 // Project root and data directory
 const projectRoot = process.cwd();
@@ -32,7 +33,16 @@ const createDirectoryTree = async (dirPath) => {
                 const relativePath = itemPath
                     .replace(dataDir, "")
                     .replace(/\\/g, "/");
-                result.push({ name: item, type: "file", path: relativePath });
+                let isHidden =
+                    visibleFileCache.isFileVisible(
+                        path.relative(dataDir, itemPath)
+                    ) === false;
+                result.push({
+                    name: item,
+                    type: "file",
+                    path: relativePath,
+                    hidden: isHidden,
+                });
             }
         }
 

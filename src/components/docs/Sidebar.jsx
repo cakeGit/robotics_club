@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { RiAddLine, RiBookFill, RiBookLine, RiDeleteBinLine, RiFilePaperLine, RiFolderDownloadLine, RiFolderLine, RiMenuLine, RiCloseLine } from 'react-icons/ri';
+import { RiAddLine, RiBookFill, RiBookLine, RiDeleteBinLine, RiFilePaperLine, RiFolderDownloadLine, RiFolderLine, RiMenuLine, RiCloseLine, RiEyeLine } from 'react-icons/ri';
 import PopupWrapper from '../common/PopupWrapper';
+import { FaRegEyeSlash } from 'react-icons/fa';
 
-const SidebarItem = ({ item, currentPath, depth = 0, onNavigate, userAuthenticated, onSignOut }) => {
+const SidebarItem = ({ item, currentPath, depth = 0, onNavigate, userAuthenticated, onSignOut, isHidden }) => {
   const isActive = item.type === 'file' && 
     (currentPath === item.path.substring(1) || // Remove leading slash
      currentPath === item.name);
@@ -28,7 +29,8 @@ const SidebarItem = ({ item, currentPath, depth = 0, onNavigate, userAuthenticat
             <span className="mr-2 text-sm">
               {isActive ? <RiBookFill /> : <RiBookLine />}
             </span>
-            <span>{item.name.replace('.md', '')}</span>
+            <span className={`${isHidden && !isActive ? ' text-muted-foreground line-through' : ''}`}>{item.name.replace('.md', '')}</span>
+            {item.name.endsWith('.md') && <span className="text-xs text-muted-foreground italic">.md</span>}
           </div>
           {userAuthenticated && (
             <div className="flex-shrink-0 ml-2">
@@ -45,6 +47,12 @@ const SidebarItem = ({ item, currentPath, depth = 0, onNavigate, userAuthenticat
                 <RiDeleteBinLine />
               </button>
             </div>
+          )}
+
+          {isHidden && (
+            <span className="ml-2 text-xs text-muted-foreground italic">
+              <FaRegEyeSlash />
+            </span>
           )}
         </div>
       ) : (
@@ -69,6 +77,7 @@ const SidebarItem = ({ item, currentPath, depth = 0, onNavigate, userAuthenticat
                   onNavigate={onNavigate}
                   userAuthenticated={userAuthenticated}
                   onSignOut={onSignOut}
+                  isHidden={child.hidden}
                 />
               ))}
             </ul>
@@ -83,6 +92,36 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [newPageName, setNewPageName] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
+
+  //Look for files in the items list that are not hidden, or if showHidden is true, show all
+  let itemsToShow = items;
+  if (!showHidden) {
+    const filterItems = (items) => {
+      return items
+        .filter(item => item.type === 'directory' || (item.type === 'file' && !item.hidden))
+        .map(item => {
+          if (item.type === 'directory' && item.children) {
+            return { ...item, children: filterItems(item.children) };
+          }
+          return item;
+        });
+    };
+    itemsToShow = filterItems(items);
+    //Remove empty folders recursively, make sure to be able to handle multiple layers of removal
+    const removeEmptyFolders = (items) => {
+      return items
+        .map(item => {
+          if (item.type === 'directory' && item.children) {
+            const filteredChildren = removeEmptyFolders(item.children);
+            return { ...item, children: filteredChildren };
+          }
+          return item;
+        })
+        .filter(item => item.type === 'file' || (item.type === 'directory' && item.children && item.children.length > 0));
+    };
+    itemsToShow = removeEmptyFolders(itemsToShow);
+  }
 
   const handleAddPage = async () => {
     if (!newPageName) return;
@@ -182,7 +221,7 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
         </div>
         <nav className="sidebar-nav py-4 flex-1 overflow-y-auto">
           <ul className="list-none p-0 m-0">
-            {items.map((item, index) => (
+            {itemsToShow.map((item, index) => (
               <SidebarItem 
                 key={index}
                 item={item}
@@ -190,12 +229,19 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
                 onNavigate={handleNavigate}
                 userAuthenticated={userAuthenticated}
                 onSignOut={onSignOut}
+                isHidden={item.hidden}
               />
             ))}
           </ul>
         </nav>
-        {/* Floating download button at bottom */}
-        <div>
+        {/* Download button and show hidden at bottom */}
+        <div className="w-full flex border-t border-sidebar-border">
+          <button
+            onClick={() => setShowHidden(!showHidden)}
+            className="grow flex items-center justify-center gap-2 px-3 py-2 cursor-pointer bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent text-sm">
+            <RiEyeLine />
+            <span>See Hidden</span>
+          </button>
           <button
             onClick={async () => {
               try {
@@ -214,7 +260,7 @@ const Sidebar = ({ items, currentPath, onNavigate, userAuthenticated, onSignOut 
                 alert('Failed to download content: ' + e.message);
               }
             }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 cursor-pointer bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent text-sm"
+            className="flex items-center justify-center gap-2 px-3 py-2 cursor-pointer bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent text-sm"
           >
             <RiFolderDownloadLine />
           </button>

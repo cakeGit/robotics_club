@@ -6,6 +6,10 @@ import {
 } from "../auth/server/authService.server.js";
 import fs from "fs/promises";
 import path from "path";
+import { VisibleFileCache } from "../visibleFileCache.js";
+
+export let visibleFileCache = new VisibleFileCache();
+await visibleFileCache.initialize();
 
 // Send verification email
 export const handleSendVerificationEmail = async (email) => {
@@ -91,6 +95,7 @@ export const handleSaveDocument = async (filePath, content, token) => {
 
         // Write the content to the file
         await fs.writeFile(absPath, content, "utf8");
+        visibleFileCache.refresh(path.relative(getDataDirectory(), absPath));
 
         console.log(`Document saved successfully: ${absPath}`);
         return {

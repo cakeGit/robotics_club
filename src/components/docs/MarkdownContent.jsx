@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { renderMarkdown } from '../../lib/simpleMarkdown.jsx';
+import { renderMarkdown } from '../../lib/MarkdownBuilder';
 
 const MarkdownContent = ({ path }) => {
   const [content, setContent] = useState('');
