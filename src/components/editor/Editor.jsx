@@ -169,7 +169,7 @@ const Editor = () => {
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar items={sidebarItems} currentPath={`${path || 'index'}.md`} onNavigate={(p) => navigate(`/editor/${p.replace('.md','')}`)} />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col lg:ml-0">
       {/* Header */}
       <header className="bg-card text-foreground p-4 flex justify-between items-center">
         <div className="flex items-center">
