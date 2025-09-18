@@ -16,7 +16,7 @@ function renderInlineText(text) {
             } else if (token.type === 'code') {
                 return <code key={index} style={{ background: '#f3f3f3', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>{token.text}</code>;
             } else if (token.type === 'link') {
-                return <a key={index} href={token.href} style={{ color: '#007bff', textDecoration: 'none' }}>{token.text}</a>;
+                return <a key={index} href={token.href} style={{ color: '#007bff', textDecoration: 'none' }}>{token.children}</a>;
             }
             return null;
         })}
