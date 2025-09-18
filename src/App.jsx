@@ -4,6 +4,7 @@ import DocLayout from './components/docs/DocLayout'
 import Editor from './components/editor/Editor'
 import EmailVerification from './components/auth/EmailVerification'
 import { isAuthenticated, checkAuth } from './lib/auth/authService'
+import VersionWatermark from './components/common/VersionWatermark'
 
 function HomePage() {
   return (
@@ -53,6 +54,7 @@ function AuthGuard({ children }) {
 function App() {
   return (
     <BrowserRouter>
+      <VersionWatermark />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/docs" element={<Navigate to="/docs/index.md" replace />} />

@@ -58,9 +58,9 @@ export class VisibleFileCache {
         return !this.hiddenFiles.has(filePath);
     }
 
-    refresh(path) {
+    refresh(filePath) {
         // Re-check a specific file to see if its visibility has changed
-        const fullPath = path.join(this.dataDir, path);
+        const fullPath = path.join(this.dataDir, filePath);
         fs.readFile(fullPath, "utf-8")
             .then((content) => {
                 if (this.fileContentMarksHidden(content)) {

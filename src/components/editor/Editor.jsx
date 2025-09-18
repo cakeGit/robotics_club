@@ -22,6 +22,8 @@ const Editor = () => {
   const [loadingSidebar, setLoadingSidebar] = useState(true);
   const [showImageGallery, setShowImageGallery] = useState(false);
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [pendingRoute, setPendingRoute] = useState(null);
   const editorRef = useRef(null);
   
   // Fetch document content on component mount
@@ -145,30 +147,65 @@ const Editor = () => {
       if (data.success) {
         setSuccess('Document saved successfully!');
         setOriginalContent(content);
+        return true;
       } else {
         setError('Failed to save document: ' + data.message);
+        return false;
       }
     } catch (error) {
       setError('Error saving document: ' + error.message);
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
   
+  // Handle navigation from Sidebar (with unsaved changes guard)
+  const handleNavigate = (p) => {
+    const target = p.replace(/\\/g, '/').replace(/\.md$/, '');
+    const route = `/editor/${target}`;
+    if (hasChanges) {
+      setPendingRoute(route);
+      setShowUnsavedModal(true);
+      return;
+    }
+    navigate(route);
+  };
+
   // Handle back button click
   const handleBack = () => {
+    const docsRoute = `/docs/${path.replace(/\\/g, '/')}.md`;
     if (hasChanges) {
-      if (window.confirm('You have unsaved changes. Do you want to discard them?')) {
-        navigate(`/docs/${path.replace(/\\/g, '/')}.md`);
-      }
-    } else {
-      navigate(`/docs/${path.replace(/\\/g, '/')}.md`);
+      setPendingRoute(docsRoute);
+      setShowUnsavedModal(true);
+      return;
     }
+    navigate(docsRoute);
+  };
+
+  // Modal actions for unsaved changes
+  const discardAndNavigate = () => {
+    setShowUnsavedModal(false);
+    const route = pendingRoute;
+    setPendingRoute(null);
+    if (route) navigate(route);
+  };
+
+  const saveAndExit = async () => {
+    // attempt to save; if successful, navigate to pendingRoute
+    const ok = await handleSave();
+    if (ok) {
+      setShowUnsavedModal(false);
+      const route = pendingRoute;
+      setPendingRoute(null);
+      if (route) navigate(route);
+    }
+    // if save failed, keep modal open and show error
   };
   
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      <Sidebar items={sidebarItems} currentPath={`${path || 'index'}.md`} onNavigate={(p) => navigate(`/editor/${p.replace('.md','')}`)} />
+  <div className="flex h-screen w-full overflow-hidden">
+  <Sidebar items={sidebarItems} currentPath={`${path || 'index'}.md`} onNavigate={handleNavigate} />
       <div className="flex-1 flex flex-col lg:ml-0">
       {/* Header */}
       <header className="bg-card text-foreground p-4 flex justify-between items-center">
@@ -210,6 +247,22 @@ const Editor = () => {
       {success && (
         <div className="bg-primary/10 border-l-4 border-primary text-primary-foreground p-4">
           {success}
+        </div>
+      )}
+
+      {/* Unsaved changes modal */}
+      {showUnsavedModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-lg w-full max-w-lg p-6">
+            <h3 className="text-lg font-semibold mb-2">You have unsaved changes</h3>
+            <p className="text-sm mb-4">Do you want to save your changes before leaving, discard them, or cancel?</p>
+            {error && <div className="bg-destructive/10 border-l-4 border-destructive text-destructive-foreground p-3 mb-3">{error}</div>}
+            <div className="flex justify-end space-x-2">
+              <button onClick={() => { setShowUnsavedModal(false); setPendingRoute(null); }} className="px-3 py-2 rounded bg-muted text-muted-foreground">Cancel</button>
+              <button onClick={discardAndNavigate} className="px-3 py-2 rounded bg-destructive text-destructive-foreground">Discard</button>
+              <button onClick={saveAndExit} className="px-3 py-2 rounded bg-primary text-primary-foreground">Save and Exit</button>
+            </div>
+          </div>
         </div>
       )}
       

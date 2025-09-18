@@ -257,4 +257,24 @@ div:hover > .image-caption {
   opacity: 1;
 }
 
-@custom-variant hover (&:hover)
+@custom-variant hover (&:hover) {}
+
+/* Version watermark */
+.version-watermark {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 0.5rem;
+  z-index: 9999;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  user-select: none;
+}
+
+.dark .version-watermark {
+  color: rgba(255,255,255,0.45);
+}
