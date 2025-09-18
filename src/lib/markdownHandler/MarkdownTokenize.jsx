@@ -157,14 +157,14 @@ export function tokenizeInline(text) {
 
         // accumulate plain text
         let buf = [];
-        let first = false;
+        let first = true;
         while (i < len) {
             const nc = text[i];
             // break on any special char to re-evaluate
             if (!first && (nc === '`' || nc === '[' || nc === '*' || nc === '_' )) break;
             buf.push(nc);
             i += 1;
-            first = true; //Ensure at least one char is consumed to prevent infinite loop
+            first = false; //Ensure at least one char is consumed to prevent infinite loop
         }
         flush(buf);
     }
