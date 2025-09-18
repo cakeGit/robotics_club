@@ -224,7 +224,6 @@ body {
 .md-root.prose li,
 .md-root.prose blockquote,
 .md-root.prose span,
-.md-root.prose a,
 .md-root.prose strong,
 .md-root.prose em {
   color: var(--color-foreground) !important;

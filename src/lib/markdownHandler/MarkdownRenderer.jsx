@@ -15,7 +15,7 @@ function renderInlineTextTokens(tokens) {
             } else if (token.type === 'code') {
                 return <code key={index} style={{ background: '#f3f3f3', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>{renderInlineTextTokens(token.children)}</code>;
             } else if (token.type === 'link') {
-                return <a key={index} href={token.href} style={{ color: '#007bff', textDecoration: 'none' }}>{renderInlineTextTokens(token.children)}</a>;
+                return <a key={index} href={token.href}>{renderInlineTextTokens(token.children)}</a>;
             }
             return null;
         })}
