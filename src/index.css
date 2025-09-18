@@ -230,6 +230,11 @@ body {
   color: var(--color-foreground) !important;
 }
 
+.md-root > p,
+.md-root > blockquote,
+.md-root > div {
+  margin-bottom: 0.6rem;
+}
 .md-root pre {
   background: var(--color-sidebar);
   color: var(--color-sidebar-foreground);
