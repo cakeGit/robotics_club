@@ -24,6 +24,7 @@ const Editor = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
   const [pendingRoute, setPendingRoute] = useState(null);
+  const [previewContent, setPreviewContent] = useState('');
   const editorRef = useRef(null);
   
   // Fetch document content on component mount
@@ -101,10 +102,29 @@ const Editor = () => {
   const handleEditorChange = (value) => {
     setContent(value);
   };
+
+  // Debounce preview rendering to avoid expensive re-renders on every keystroke
+  useEffect(() => {
+    const t = setTimeout(() => setPreviewContent(content), 250);
+    return () => clearTimeout(t);
+  }, [content]);
   
   // Handle editor mounting
-  const handleEditorDidMount = (editor) => {
+  const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    try {
+      editor.updateOptions({
+        quickSuggestions: false,
+        suggestOnTriggerCharacters: false,
+        wordBasedSuggestions: false,
+        acceptSuggestionOnEnter: 'off',
+        inlineSuggest: false,
+        parameterHints: { enabled: false },
+      });
+    } catch (e) {
+      // ignore if editor doesn't support some options in this environment
+      console.warn('Failed to update Monaco editor options', e);
+    }
   };
   
   // Handle image selection from gallery
@@ -282,7 +302,7 @@ const Editor = () => {
       {/* Editor & Preview area (grid) */}
       <div className="flex-1 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 h-full">
-          <div className="h-full overflow-auto border-r border-border">
+          <div className="h-full overflow-auto border-r border-border overflow-hidden">
             <MonacoEditor
               height="100%"
               language="markdown"
@@ -295,13 +315,20 @@ const Editor = () => {
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 fontSize: 14,
+                // also set options here as a safety net
+                quickSuggestions: false,
+                suggestOnTriggerCharacters: false,
+                wordBasedSuggestions: false,
+                parameterHints: { enabled: false },
+                acceptSuggestionOnEnter: 'off',
+                hover: { enabled: false },
               }}
             />
           </div>
           <div className="h-full overflow-auto bg-background p-4">
             <div className="prose max-w-none dark:prose-invert text-foreground h-full">
               <div className="h-full overflow-auto md-root">
-                {renderMarkdown(content)}
+                {renderMarkdown(previewContent)}
               </div>
             </div>
           </div>
