@@ -8,7 +8,7 @@ function renderInlineTextTokens(tokens) {
         {tokens.map((token, index) => {
             if (token.type === 'text') {
                 return token.text;
-            } else if (token.type === 'bold') {
+            } else if (token.type === 'strong') {
                 return <strong key={index}>{renderInlineTextTokens(token.children)}</strong>;
             } else if (token.type === 'italic') {
                 return <em key={index}>{renderInlineTextTokens(token.children)}</em>;
