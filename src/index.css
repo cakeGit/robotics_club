@@ -235,6 +235,12 @@ body {
 .md-root > div {
   margin-bottom: 0.6rem;
 }
+
+.md-root a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
 .md-root pre {
   background: var(--color-sidebar);
   color: var(--color-sidebar-foreground);
