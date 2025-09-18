@@ -3,7 +3,7 @@ import { tokenizeInline } from "./MarkdownTokenize";
 import ScratchBlock from "../../components/ScratchBlock";
 import { FaRegEyeSlash } from 'react-icons/fa';
 
-function renderInlineTextTokens(tokens) {
+function renderInlineTextTokens(tokens=[]) {
     const element = <>
         {tokens.map((token, index) => {
             if (token.type === 'text') {
@@ -28,7 +28,7 @@ function renderInlineText(text) {
     return renderInlineTextTokens(inlineTokens);
 }
 
-export function renderTokens(tokens) {
+export function renderTokens(tokens = []) {
     const elements = <>
         {
             tokens.map((t, idx) => {
