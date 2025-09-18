@@ -4,9 +4,8 @@ import ScratchBlock from "../../components/ScratchBlock";
 import { FaRegEyeSlash } from 'react-icons/fa';
 
 function renderInlineTextTokens(tokens) {
-
     const element = <>
-        {inlineTokens.map((token, index) => {
+        {tokens.map((token, index) => {
             if (token.type === 'text') {
                 return token.text;
             } else if (token.type === 'bold') {
