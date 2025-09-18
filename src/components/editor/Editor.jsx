@@ -222,6 +222,23 @@ const Editor = () => {
     }
     // if save failed, keep modal open and show error
   };
+
+  // Handle Ctrl/Cmd+S to save (prevent browser save dialog)
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const key = (e.key || '').toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && key === 's') {
+        e.preventDefault();
+        // only attempt save when there are changes and not already saving
+        if (!isSaving && hasChanges) {
+          handleSave();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isSaving, hasChanges, content, path]);
   
   return (
   <div className="flex h-screen w-full overflow-hidden">
