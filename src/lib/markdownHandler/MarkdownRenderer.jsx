@@ -3,25 +3,30 @@ import { tokenizeInline } from "./MarkdownTokenize";
 import ScratchBlock from "../../components/ScratchBlock";
 import { FaRegEyeSlash } from 'react-icons/fa';
 
-function renderInlineText(text) {
-    let inlineTokens = tokenizeInline(text);
+function renderInlineTextTokens(tokens) {
+
     const element = <>
         {inlineTokens.map((token, index) => {
             if (token.type === 'text') {
                 return token.text;
             } else if (token.type === 'bold') {
-                return <strong key={index}>{token.text}</strong>;
+                return <strong key={index}>{renderInlineTextTokens(token.children)}</strong>;
             } else if (token.type === 'italic') {
-                return <em key={index}>{token.text}</em>;
+                return <em key={index}>{renderInlineTextTokens(token.children)}</em>;
             } else if (token.type === 'code') {
-                return <code key={index} style={{ background: '#f3f3f3', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>{token.text}</code>;
+                return <code key={index} style={{ background: '#f3f3f3', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>{renderInlineTextTokens(token.children)}</code>;
             } else if (token.type === 'link') {
-                return <a key={index} href={token.href} style={{ color: '#007bff', textDecoration: 'none' }}>{token.children}</a>;
+                return <a key={index} href={token.href} style={{ color: '#007bff', textDecoration: 'none' }}>{renderInlineTextTokens(token.children)}</a>;
             }
             return null;
         })}
     </>;
     return element;
+}
+
+function renderInlineText(text) {
+    let inlineTokens = tokenizeInline(text);
+    return renderInlineTextTokens(inlineTokens);
 }
 
 export function renderTokens(tokens) {
