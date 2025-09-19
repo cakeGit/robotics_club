@@ -68,6 +68,14 @@ export function tokenize(md) {
       continue;
     }
 
+    // callout: {info|warning|extension}(Callout inline text)
+    const calloutMatch = line.match(/^\{(info|warning|extension)\}\((.*)\)$/);
+    if (calloutMatch) {
+      tokens.push({ type: 'callout', kind: calloutMatch[1], text: calloutMatch[2] });
+      i += 1;
+      continue;
+    }
+
     // paragraph
     const paraLines = [line.trim()];
     i += 1;

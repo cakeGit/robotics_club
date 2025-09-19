@@ -2,6 +2,9 @@ import React from "react";
 import { tokenizeInline } from "./MarkdownTokenize";
 import ScratchBlock from "../../components/ScratchBlock";
 import { FaRegEyeSlash } from 'react-icons/fa';
+import { FaExclamationTriangle } from 'react-icons/fa';
+import { LuBlocks } from "react-icons/lu";
+import { GiLightBulb } from 'react-icons/gi';
 
 function renderInlineTextTokens(tokens=[]) {
     const element = <>
@@ -48,6 +51,28 @@ export function renderTokens(tokens = []) {
                     }
                 } else if (t.type === "meta-page-hidden-note") {
                     return <div key={`meta-${idx}`} className="bg-accent mb-5 rounded-lg block max-w-max border-accent-foreground p-3">Hidden Page <FaRegEyeSlash className="inline" /></div>;
+                } else if (t.type === 'callout') {
+                    const kind = t.kind || 'info';
+                    let containerClass = 'flex gap-3 items-start p-3 rounded-md my-2';
+                    let iconClass = 'mt-1 text-current';
+                    let textClass = '';
+
+                    if (kind === 'warning') {
+                        containerClass += ' bg-yellow-600/80 text-amber-50';
+                    } else if (kind === 'extension') {
+                        containerClass += ' bg-cyan-600/80 text-blue-50';
+                    } else {
+                        containerClass += ' bg-accent/70 text-gray-300';
+                    }
+
+                    return (
+                        <div key={`callout-${idx}`} className={containerClass} role="note">
+                            <div className={iconClass} aria-hidden>
+                                {kind === 'warning' ? <FaExclamationTriangle /> : kind === 'extension' ? <LuBlocks /> : <GiLightBulb />}
+                            </div>
+                            <div className={textClass}>{renderInlineText(t.text)}</div>
+                        </div>
+                    );
                 } else if (t.type === 'image') {
                     return (
                         <div
