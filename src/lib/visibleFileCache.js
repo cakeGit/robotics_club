@@ -64,9 +64,9 @@ export class VisibleFileCache {
         fs.readFile(fullPath, "utf-8")
             .then((content) => {
                 if (this.fileContentMarksHidden(content)) {
-                    this.hiddenFiles.add(fullPath);
+                    this.hiddenFiles.add(filePath);
                 } else {
-                    this.hiddenFiles.delete(fullPath);
+                    this.hiddenFiles.delete(filePath);
                 }
             })
             .catch((err) => {

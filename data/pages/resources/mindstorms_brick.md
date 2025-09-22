@@ -1,7 +1,7 @@
 ---
 hidden:true
 ---
-
+s
 # Mindstorms Brick
 
 Here is some information on the mindstorms brick
